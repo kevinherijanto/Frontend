@@ -6,9 +6,8 @@ function App() {
   const [username, setUsername] = useState('');
   const [wallets, setWallets] = useState([]);
   const [newWallet, setNewWallet] = useState(null);
-  const [showNewWallet, setShowNewWallet] = useState(false);
-  const [socket, setSocket] = useState(null);
   const [editingWallet, setEditingWallet] = useState(null);
+  const [showNewWallet, setShowNewWallet] = useState(false);
 
   // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
@@ -21,7 +20,8 @@ function App() {
         );
         console.log('Response:', response);  // Log the full response for debugging
         if (response.data.error) {
-          setWallets([]);  // Empty wallets if no data found
+          // If the backend returns an error message like 'No wallets found'
+          setWallets([]); // Empty wallets if no data found
         } else {
           setWallets(response.data);  // Otherwise, update with the wallet data
         }
@@ -31,6 +31,14 @@ function App() {
       }
     }
   }, [username]);
+  
+
+  const handleWalletCreated = (wallet) => {
+    setNewWallet(wallet);
+    setShowNewWallet(true);
+    setTimeout(() => setShowNewWallet(false), 1000);
+    fetchWallets();
+  };
 
   const handleUpdateWallet = async (updatedWallet) => {
     try {
@@ -38,8 +46,8 @@ function App() {
         `https://backend-production-4e20.up.railway.app/wallets/${updatedWallet.id}`,
         updatedWallet
       );
+      setEditingWallet(null);
       fetchWallets();
-      setEditingWallet(null); // Reset editingWallet after updating
     } catch (error) {
       console.error('Error updating wallet:', error);
     }
@@ -58,22 +66,20 @@ function App() {
     }
   };
 
-  // WebSocket connection logic that only happens when required
-  const startWebSocketConnection = () => {
-    if (socket) return; // If WebSocket is already open, don't reconnect
+  // WebSocket notification for new wallet creation
+  useEffect(() => {
+    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app:8081'); // Replace with your WebSocket server URL
 
-    const newSocket = new WebSocket('wss://backend-production-4e20.up.railway.app:8081'); // Replace with your WebSocket server URL
-
-    newSocket.onopen = () => {
+    socket.onopen = () => {
       console.log('WebSocket connected');
     };
 
-    newSocket.onmessage = (event) => {
+    socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'new_wallet') {
-          setNewWallet(data.wallet); // Set the new wallet data from WebSocket
-          setShowNewWallet(true); // Show the popup when a new wallet is received from WebSocket
+          setNewWallet(data.wallet); // Set the new wallet data
+          setShowNewWallet(true); // Show the popup
           setTimeout(() => setShowNewWallet(false), 5000); // Auto-hide popup after 5 seconds
           fetchWallets(); // Refresh the wallet list
         }
@@ -82,26 +88,23 @@ function App() {
       }
     };
 
-    newSocket.onerror = (error) => {
+    socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
 
-    newSocket.onclose = () => {
+    socket.onclose = () => {
       console.log('WebSocket disconnected');
     };
 
-    setSocket(newSocket); // Save the WebSocket connection in state
-  };
+    return () => {
+      socket.close(); // Clean up the WebSocket connection on component unmount
+    };
+  }, [fetchWallets]); // Include fetchWallets in the dependency array
 
   // Fetch wallets when username changes
   useEffect(() => {
     if (username.trim()) fetchWallets();
-  }, [username, fetchWallets]);
-
-  // Start WebSocket connection after wallet creation
-  const handleWalletCreated = () => {
-    startWebSocketConnection();
-  };
+  }, [username, fetchWallets]); // Add fetchWallets to dependency array
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
@@ -161,7 +164,7 @@ function App() {
                   </p>
                   <div className="mt-2 flex space-x-2">
                     <button
-                      onClick={() => setEditingWallet(wallet)} // Set the wallet to be edited
+                      onClick={() => setEditingWallet(wallet)}
                       className="text-blue-500 hover:text-blue-700"
                     >
                       Edit Wallet
@@ -230,8 +233,8 @@ function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setEditingWallet(null)} // Reset editingWallet when canceling
-                className="w-full p-2 bg-gray-500 text-white rounded-lg mt-2"
+                onClick={() => setEditingWallet(null)}
+                className="w-full p-2 bg-gray-300 text-gray-700 rounded-lg mt-2"
               >
                 Cancel
               </button>
