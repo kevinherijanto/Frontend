@@ -1,15 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import CreateWallet from './components/CreateWallet';
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import CreateWallet from "./components/CreateWallet";
 
 function App() {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [wallets, setWallets] = useState([]);
   const [newWallet, setNewWallet] = useState(null);
   const [editingWallet, setEditingWallet] = useState(null);
   const [showNewWallet, setShowNewWallet] = useState(false);
 
-  // Handle username change
+  // Chat State
+  const [chatMessages, setChatMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [socket, setSocket] = useState(null);
+
   const handleUsernameChange = (e) => setUsername(e.target.value);
 
   const fetchWallets = useCallback(async () => {
@@ -18,20 +22,17 @@ function App() {
         const response = await axios.get(
           `https://backend-production-4e20.up.railway.app/wallets/username/${username}`
         );
-        console.log('Response:', response);  // Log the full response for debugging
         if (response.data.error) {
-          // If the backend returns an error message like 'No wallets found'
-          setWallets([]); // Empty wallets if no data found
+          setWallets([]);
         } else {
-          setWallets(response.data);  // Otherwise, update with the wallet data
+          setWallets(response.data);
         }
       } catch (error) {
-        console.error('Error fetching wallets:', error);
-        setWallets([]);  // Clear wallets on error
+        console.error("Error fetching wallets:", error);
+        setWallets([]);
       }
     }
   }, [username]);
-  
 
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
@@ -49,62 +50,57 @@ function App() {
       setEditingWallet(null);
       fetchWallets();
     } catch (error) {
-      console.error('Error updating wallet:', error);
+      console.error("Error updating wallet:", error);
     }
   };
 
   const handleDeleteWallet = async (walletId) => {
-    if (window.confirm('Are you sure you want to delete this wallet?')) {
+    if (window.confirm("Are you sure you want to delete this wallet?")) {
       try {
         await axios.delete(
           `https://backend-production-4e20.up.railway.app/wallets/${walletId}`
         );
         fetchWallets();
       } catch (error) {
-        console.error('Error deleting wallet:', error);
+        console.error("Error deleting wallet:", error);
       }
     }
   };
 
-  // WebSocket notification for new wallet creation
+  // WebSocket Setup
   useEffect(() => {
-    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app/ws'); // Replace with your WebSocket server URL
+    const ws = new WebSocket("wss://backend-production-4e20.up.railway.app/ws");
 
-    socket.onopen = () => {
-      console.log('WebSocket connected');
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+      ws.send(JSON.stringify({ type: "join", username }));
     };
 
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'new_wallet') {
-          setNewWallet(data.wallet); // Set the new wallet data
-          setShowNewWallet(true); // Show the popup
-          setTimeout(() => setShowNewWallet(false), 5000); // Auto-hide popup after 5 seconds
-          fetchWallets(); // Refresh the wallet list
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      setChatMessages((prev) => [...prev, message]);
     };
 
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    ws.onerror = (error) => console.error("WebSocket error:", error);
+    ws.onclose = () => console.log("WebSocket disconnected");
 
-    socket.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
+    setSocket(ws);
 
     return () => {
-      socket.close(); // Clean up the WebSocket connection on component unmount
+      ws.close();
     };
-  }, [fetchWallets]); // Include fetchWallets in the dependency array
+  }, [username]);
 
-  // Fetch wallets when username changes
+  const sendMessage = () => {
+    if (socket && messageInput.trim()) {
+      socket.send(JSON.stringify({ username, message: messageInput }));
+      setMessageInput("");
+    }
+  };
+
   useEffect(() => {
     if (username.trim()) fetchWallets();
-  }, [username, fetchWallets]); // Add fetchWallets to dependency array
+  }, [username, fetchWallets]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
@@ -127,120 +123,71 @@ function App() {
           />
         </div>
 
-        {/* Wallet Creation Form */}
+        {/* Wallet Section */}
         <CreateWallet username={username} onWalletCreated={handleWalletCreated} />
 
-        {/* New Wallet Notification */}
         {showNewWallet && newWallet && (
           <div className="mt-6 p-4 bg-green-100 rounded-lg shadow-sm">
             <h3 className="text-lg font-medium text-green-800">New Wallet Created:</h3>
-            <p className="text-gray-700">
+            <p>
               <strong>Address:</strong> {newWallet.address}
             </p>
-            <p className="text-gray-700">
+            <p>
               <strong>Balance:</strong> {newWallet.balance}
             </p>
-            <p className="text-gray-700">
+            <p>
               <strong>Currency:</strong> {newWallet.currency}
             </p>
           </div>
         )}
 
-        {/* Wallet List */}
         {wallets.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Wallets</h2>
-            <ul className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">Your Wallets</h2>
+            <ul>
               {wallets.map((wallet) => (
-                <li key={wallet.id} className="p-4 bg-gray-50 rounded-lg shadow-md">
-                  <p className="text-gray-700">
+                <li key={wallet.id}>
+                  <p>
                     <strong>Address:</strong> {wallet.address}
                   </p>
-                  <p className="text-gray-700">
+                  <p>
                     <strong>Balance:</strong> {wallet.balance}
                   </p>
-                  <p className="text-gray-700">
+                  <p>
                     <strong>Currency:</strong> {wallet.currency}
                   </p>
-                  <div className="mt-2 flex space-x-2">
-                    <button
-                      onClick={() => setEditingWallet(wallet)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      Edit Wallet
-                    </button>
-                    <button
-                      onClick={() => handleDeleteWallet(wallet.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete Wallet
-                    </button>
-                  </div>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        {/* Edit Wallet Form */}
-        {editingWallet && (
-          <div className="mt-6 p-4 bg-yellow-100 rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium text-yellow-800">Edit Wallet</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdateWallet(editingWallet);
-              }}
-            >
-              <input
-                type="text"
-                value={editingWallet.address}
-                onChange={(e) =>
-                  setEditingWallet({ ...editingWallet, address: e.target.value })
-                }
-                className="w-full p-2 border border-gray-300 rounded-lg mb-2"
-                placeholder="Wallet Address"
-                required
-              />
-              <input
-                type="number"
-                value={editingWallet.balance}
-                onChange={(e) =>
-                  setEditingWallet({
-                    ...editingWallet,
-                    balance: parseFloat(e.target.value),
-                  })
-                }
-                className="w-full p-2 border border-gray-300 rounded-lg mb-2"
-                placeholder="Balance"
-                required
-              />
-              <input
-                type="text"
-                value={editingWallet.currency}
-                onChange={(e) =>
-                  setEditingWallet({ ...editingWallet, currency: e.target.value })
-                }
-                className="w-full p-2 border border-gray-300 rounded-lg mb-2"
-                placeholder="Currency"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full p-2 bg-blue-600 text-white rounded-lg mt-2"
-              >
-                Update Wallet
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditingWallet(null)}
-                className="w-full p-2 bg-gray-300 text-gray-700 rounded-lg mt-2"
-              >
-                Cancel
-              </button>
-            </form>
+        {/* Chat Section */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Chat</h2>
+          <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
+            {chatMessages.map((msg, index) => (
+              <div key={index}>
+                <strong>{msg.username}:</strong> {msg.message}
+              </div>
+            ))}
           </div>
-        )}
+          <div className="mt-4 flex">
+            <input
+              type="text"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              placeholder="Type a message"
+              className="flex-1 p-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              onClick={sendMessage}
+              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              Send
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
