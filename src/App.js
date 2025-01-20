@@ -36,14 +36,14 @@ function App() {
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
     setShowNewWallet(true);
-    setTimeout(() => setShowNewWallet(false), 5000);
+    setTimeout(() => setShowNewWallet(false), 1000);
     fetchWallets();
   };
 
   const handleUpdateWallet = async (updatedWallet) => {
     try {
       await axios.put(
-        `https://backend-production-4e20.up.railway.app/wallets/${updatedWallet.ID}`,
+        `https://backend-production-4e20.up.railway.app/wallets/${updatedWallet.id}`,
         updatedWallet
       );
       setEditingWallet(null);
