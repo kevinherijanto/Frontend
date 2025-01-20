@@ -6,9 +6,9 @@ function App() {
   const [username, setUsername] = useState('');
   const [wallets, setWallets] = useState([]);
   const [newWallet, setNewWallet] = useState(null);
-  const [editingWallet, setEditingWallet] = useState(null);
   const [showNewWallet, setShowNewWallet] = useState(false);
-  const [socket, setSocket] = useState(null); // State to store the WebSocket connection
+  const [socket, setSocket] = useState(null);
+  const [editingWallet, setEditingWallet] = useState(null); // Initialize editingWallet state
 
   // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
@@ -21,8 +21,7 @@ function App() {
         );
         console.log('Response:', response);  // Log the full response for debugging
         if (response.data.error) {
-          // If the backend returns an error message like 'No wallets found'
-          setWallets([]); // Empty wallets if no data found
+          setWallets([]);  // Empty wallets if no data found
         } else {
           setWallets(response.data);  // Otherwise, update with the wallet data
         }
@@ -33,22 +32,14 @@ function App() {
     }
   }, [username]);
 
-  const handleWalletCreated = (wallet) => {
-    setNewWallet(wallet);
-    setShowNewWallet(true);
-    setTimeout(() => setShowNewWallet(false), 1000);
-    fetchWallets();
-    startWebSocketConnection();  // Trigger WebSocket connection on wallet creation
-  };
-
   const handleUpdateWallet = async (updatedWallet) => {
     try {
       await axios.put(
         `https://backend-production-4e20.up.railway.app/wallets/${updatedWallet.id}`,
         updatedWallet
       );
-      setEditingWallet(null);
       fetchWallets();
+      setEditingWallet(null); // Reset editingWallet after updating
     } catch (error) {
       console.error('Error updating wallet:', error);
     }
@@ -81,8 +72,8 @@ function App() {
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'new_wallet') {
-          setNewWallet(data.wallet); // Set the new wallet data
-          setShowNewWallet(true); // Show the popup
+          setNewWallet(data.wallet); // Set the new wallet data from WebSocket
+          setShowNewWallet(true); // Show the popup when a new wallet is received from WebSocket
           setTimeout(() => setShowNewWallet(false), 5000); // Auto-hide popup after 5 seconds
           fetchWallets(); // Refresh the wallet list
         }
@@ -129,7 +120,7 @@ function App() {
         </div>
 
         {/* Wallet Creation Form */}
-        <CreateWallet username={username} onWalletCreated={handleWalletCreated} />
+        <CreateWallet username={username} onWalletCreated={() => startWebSocketConnection()} />
 
         {/* New Wallet Notification */}
         {showNewWallet && newWallet && (
@@ -165,7 +156,7 @@ function App() {
                   </p>
                   <div className="mt-2 flex space-x-2">
                     <button
-                      onClick={() => setEditingWallet(wallet)}
+                      onClick={() => setEditingWallet(wallet)} // Set the wallet to be edited
                       className="text-blue-500 hover:text-blue-700"
                     >
                       Edit Wallet
@@ -234,7 +225,7 @@ function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setEditingWallet(null)}
+                onClick={() => setEditingWallet(null)} // Reset editingWallet when canceling
                 className="w-full p-2 bg-gray-300 text-gray-700 rounded-lg mt-2"
               >
                 Cancel
