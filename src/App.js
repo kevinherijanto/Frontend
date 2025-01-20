@@ -82,7 +82,7 @@ function App() {
   // Fetch chat history from the backend
   const fetchChatHistory = async () => {
     try {
-      const response = await axios.get('https://your-backend-api-url/api/chat-history');
+      const response = await axios.get('https://backend-production-4e20.up.railway.app/api/chat-history');
       setChatMessages(response.data); // Update chatMessages state with the data received
     } catch (error) {
       console.error("Error fetching chat history:", error);
