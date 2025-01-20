@@ -170,7 +170,7 @@ function App() {
                       Edit Wallet
                     </button>
                     <button
-                      onClick={() => handleDeleteWallet(wallet.ID)}
+                      onClick={() => handleDeleteWallet(wallet.id)}
                       className="text-red-500 hover:text-red-700"
                     >
                       Delete Wallet
