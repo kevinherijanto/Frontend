@@ -93,12 +93,12 @@ function App() {
     return () => {
       socket.close(); // Clean up the WebSocket connection on component unmount
     };
-    }, [username]); // Reconnect WebSocket when username changes
+    }, [fetchWallets]); // Reconnect WebSocket when username changes
 
   // Fetch wallets when username changes
   useEffect(() => {
     if (username.trim()) fetchWallets();
-  }, [username]);
+  }, [username, fetchWallets]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
