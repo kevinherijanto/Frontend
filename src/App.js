@@ -267,7 +267,9 @@ function App() {
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Chat Room</h2>
               <div className="space-y-2">
-                {chatMessages.map((msg, index) => (
+                {chatMessages
+                .filter((msg) => msg.message.trim() !== "")
+                .map((msg, index) => (
                   <div key={index} className="p-2 bg-gray-100 rounded-md shadow-sm">
                     <p>
                       <strong>{msg.username}:</strong> {msg.message}
