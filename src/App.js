@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CreateWallet from './components/CreateWallet';
 
@@ -12,8 +12,8 @@ function App() {
   // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
 
-  // Fetch wallets for the entered username
-  const fetchWallets = async () => {
+  // Memoize fetchWallets to avoid unnecessary re-renders
+  const fetchWallets = useCallback(async () => {
     if (username.trim()) {
       try {
         const response = await axios.get(
@@ -25,7 +25,7 @@ function App() {
         setWallets([]);
       }
     }
-  };
+  }, [username]); // Dependency on username to re-fetch wallets when it changes
 
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
@@ -93,12 +93,12 @@ function App() {
     return () => {
       socket.close(); // Clean up the WebSocket connection on component unmount
     };
-    }, [fetchWallets]); // Reconnect WebSocket when username changes
+  }, [fetchWallets]); // Include fetchWallets in the dependency array
 
   // Fetch wallets when username changes
   useEffect(() => {
     if (username.trim()) fetchWallets();
-  }, [username, fetchWallets]);
+  }, [username, fetchWallets]); // Add fetchWallets to dependency array
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
