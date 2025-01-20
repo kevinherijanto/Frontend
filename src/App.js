@@ -13,9 +13,20 @@ function App() {
   const [chatMessages, setChatMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [socket, setSocket] = useState(null);
+  const [isValidUsername, setIsValidUsername] = useState(false); // Add state for username validation
 
   // Handle username change
-  const handleUsernameChange = (e) => setUsername(e.target.value);
+  const handleUsernameChange = (e) => {
+    const value = e.target.value;
+    setUsername(value);
+
+    // Check if the username is valid (non-empty)
+    if (value.trim()) {
+      setIsValidUsername(true);
+    } else {
+      setIsValidUsername(false);
+    }
+  };
 
   const fetchWallets = useCallback(async () => {
     if (username.trim()) {
@@ -70,27 +81,29 @@ function App() {
 
   // WebSocket Setup
   useEffect(() => {
-    const ws = new WebSocket("wss://backend-production-4e20.up.railway.app/ws");
+    if (isValidUsername) { // Check if username is valid before connecting WebSocket
+      const ws = new WebSocket("wss://backend-production-4e20.up.railway.app/ws");
 
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-      ws.send(JSON.stringify({ type: "join", username }));
-    };
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+        ws.send(JSON.stringify({ type: "join", username }));
+      };
 
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      setChatMessages((prev) => [...prev, message]);
-    };
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        setChatMessages((prev) => [...prev, message]);
+      };
 
-    ws.onerror = (error) => console.error("WebSocket error:", error);
-    ws.onclose = () => console.log("WebSocket disconnected");
+      ws.onerror = (error) => console.error("WebSocket error:", error);
+      ws.onclose = () => console.log("WebSocket disconnected");
 
-    setSocket(ws);
+      setSocket(ws);
 
-    return () => {
-      ws.close();
-    };
-  }, [username]);
+      return () => {
+        ws.close();
+      };
+    }
+  }, [username, isValidUsername]);
 
   const sendMessage = () => {
     if (socket && messageInput.trim()) {
@@ -240,31 +253,33 @@ function App() {
         )}
 
         {/* Chat Section */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
-          <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
-            {chatMessages.map((msg, index) => (
-              <div key={index}>
-                <strong>{msg.username}:</strong> {msg.message}
-              </div>
-            ))}
+        {isValidUsername && (
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
+            <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
+              {chatMessages.map((msg, index) => (
+                <div key={index}>
+                  <strong>{msg.username}:</strong> {msg.message}
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex">
+              <input
+                type="text"
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                placeholder="Type a message"
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              />
+              <button
+                onClick={sendMessage}
+                className="ml-2 p-2 bg-blue-600 text-white rounded-lg"
+              >
+                Send
+              </button>
+            </div>
           </div>
-          <div className="mt-4 flex">
-            <input
-              type="text"
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              placeholder="Type a message"
-              className="flex-1 p-2 border border-gray-300 rounded-lg"
-            />
-            <button
-              onClick={sendMessage}
-              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
-            >
-              Send
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
