@@ -8,6 +8,7 @@ function App() {
   const [newWallet, setNewWallet] = useState(null);
   const [editingWallet, setEditingWallet] = useState(null);
   const [showNewWallet, setShowNewWallet] = useState(false);
+  const [socket, setSocket] = useState(null); // State to store the WebSocket connection
 
   // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
@@ -31,13 +32,13 @@ function App() {
       }
     }
   }, [username]);
-  
 
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
     setShowNewWallet(true);
     setTimeout(() => setShowNewWallet(false), 1000);
     fetchWallets();
+    startWebSocketConnection();  // Trigger WebSocket connection on wallet creation
   };
 
   const handleUpdateWallet = async (updatedWallet) => {
@@ -66,15 +67,17 @@ function App() {
     }
   };
 
-  // WebSocket notification for new wallet creation
-  useEffect(() => {
-    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app:8081'); // Replace with your WebSocket server URL
+  // WebSocket connection logic that only happens when required
+  const startWebSocketConnection = () => {
+    if (socket) return; // If WebSocket is already open, don't reconnect
 
-    socket.onopen = () => {
+    const newSocket = new WebSocket('wss://backend-production-4e20.up.railway.app:8081'); // Replace with your WebSocket server URL
+
+    newSocket.onopen = () => {
       console.log('WebSocket connected');
     };
 
-    socket.onmessage = (event) => {
+    newSocket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'new_wallet') {
@@ -88,23 +91,21 @@ function App() {
       }
     };
 
-    socket.onerror = (error) => {
+    newSocket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
 
-    socket.onclose = () => {
+    newSocket.onclose = () => {
       console.log('WebSocket disconnected');
     };
 
-    return () => {
-      socket.close(); // Clean up the WebSocket connection on component unmount
-    };
-  }, [fetchWallets]); // Include fetchWallets in the dependency array
+    setSocket(newSocket); // Save the WebSocket connection in state
+  };
 
   // Fetch wallets when username changes
   useEffect(() => {
     if (username.trim()) fetchWallets();
-  }, [username, fetchWallets]); // Add fetchWallets to dependency array
+  }, [username, fetchWallets]);
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
