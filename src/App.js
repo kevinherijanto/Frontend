@@ -126,7 +126,7 @@ function App() {
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         <h1 className="text-3xl font-semibold text-center text-blue-600 mb-6">
-          My Private Crypto Wallet
+          My Private Crypto Wallet Tracker
         </h1>
 
         {/* Username input */}
