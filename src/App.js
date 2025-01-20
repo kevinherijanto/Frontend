@@ -16,7 +16,7 @@ function App() {
   const fetchWallets = async () => {
     if (username.trim()) {
       try {
-        const response = await axios.get(`http://localhost:3000/wallets/username/${username}`);
+        const response = await axios.get(`http://backend-production-4e20.up.railway.app:3000/wallets/username/${username}`);
         setWallets(response.data);
       } catch (error) {
         console.error('Error fetching wallets:', error);
@@ -34,7 +34,7 @@ function App() {
 
   const handleUpdateWallet = async (updatedWallet) => {
     try {
-      await axios.put(`http://localhost:3000/wallets/${updatedWallet.ID}`, updatedWallet);
+      await axios.put(`http://backend-production-4e20.up.railway.app:3000/wallets/${updatedWallet.ID}`, updatedWallet);
       setEditingWallet(null);
       fetchWallets();
     } catch (error) {
@@ -45,7 +45,7 @@ function App() {
   const handleDeleteWallet = async (walletId) => {
     if (window.confirm('Are you sure you want to delete this wallet?')) {
       try {
-        await axios.delete(`http://localhost:3000/wallets/${walletId}`);
+        await axios.delete(`http://backend-production-4e20.up.railway.app:3000/wallets/${walletId}`);
         fetchWallets();
       } catch (error) {
         console.error('Error deleting wallet:', error);
@@ -55,35 +55,38 @@ function App() {
 
   // WebSocket notification for new wallet creation
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080'); // Ensure the WebSocket server is running
-
+    const socket = new WebSocket('ws://backend-production-4e20.up.railway.app:8080'); // Ensure the WebSocket server is running
+  
     socket.onopen = () => {
       console.log('WebSocket connected');
       setWs(socket);
     };
-
+  
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'new_wallet') {
-        setNewWallet(data.wallet);
-        setShowNewWallet(true);
-        setTimeout(() => setShowNewWallet(false), 5000);
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'new_wallet') {
+          handleWalletCreated(data.wallet); // Directly call handleWalletCreated
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
       }
     };
-
+  
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
-
+  
     socket.onclose = () => {
       console.log('WebSocket disconnected');
       setWs(null);
     };
-
+  
     return () => {
       socket.close();
     };
   }, []);
+  
 
   // Fetch wallets when username changes
   useEffect(() => {
