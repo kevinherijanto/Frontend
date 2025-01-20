@@ -9,6 +9,9 @@ function App() {
   const [editingWallet, setEditingWallet] = useState(null);
   const [showNewWallet, setShowNewWallet] = useState(false);
 
+  // Handle username change
+  const handleUsernameChange = (e) => setUsername(e.target.value);
+
   // Fetch wallets for the entered username
   const fetchWallets = async () => {
     if (username.trim()) {
@@ -59,9 +62,7 @@ function App() {
 
   // WebSocket notification for new wallet creation
   useEffect(() => {
-    const socket = new WebSocket(
-      'ws://backend-production-4e20.up.railway.app:8080'
-    );
+    const socket = new WebSocket('ws://backend-production-4e20.up.railway.app:8080'); // Replace with your WebSocket server URL
 
     socket.onopen = () => {
       console.log('WebSocket connected');
@@ -71,7 +72,10 @@ function App() {
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'new_wallet') {
-          handleWalletCreated(data.wallet); // Handle wallet creation
+          setNewWallet(data.wallet); // Set the new wallet data
+          setShowNewWallet(true); // Show the popup
+          setTimeout(() => setShowNewWallet(false), 5000); // Auto-hide popup after 5 seconds
+          fetchWallets(); // Refresh the wallet list
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -87,9 +91,9 @@ function App() {
     };
 
     return () => {
-      socket.close(); // Cleanup on component unmount
+      socket.close(); // Clean up the WebSocket connection on component unmount
     };
-  }, []);
+    }, [username]); // Reconnect WebSocket when username changes
 
   // Fetch wallets when username changes
   useEffect(() => {
@@ -111,7 +115,7 @@ function App() {
           <input
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={handleUsernameChange}
             placeholder="Enter your username"
             className="w-full mt-2 p-2 border border-gray-300 rounded-lg"
           />
