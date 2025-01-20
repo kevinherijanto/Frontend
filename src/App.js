@@ -8,7 +8,7 @@ function App() {
   const [newWallet, setNewWallet] = useState(null);
   const [showNewWallet, setShowNewWallet] = useState(false);
   const [socket, setSocket] = useState(null);
-  const [editingWallet, setEditingWallet] = useState(null); // Initialize editingWallet state
+  const [editingWallet, setEditingWallet] = useState(null);
 
   // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
@@ -98,6 +98,11 @@ function App() {
     if (username.trim()) fetchWallets();
   }, [username, fetchWallets]);
 
+  // Start WebSocket connection after wallet creation
+  const handleWalletCreated = () => {
+    startWebSocketConnection();
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -120,7 +125,7 @@ function App() {
         </div>
 
         {/* Wallet Creation Form */}
-        <CreateWallet username={username} onWalletCreated={() => startWebSocketConnection()} />
+        <CreateWallet username={username} onWalletCreated={handleWalletCreated} />
 
         {/* New Wallet Notification */}
         {showNewWallet && newWallet && (
@@ -226,7 +231,7 @@ function App() {
               <button
                 type="button"
                 onClick={() => setEditingWallet(null)} // Reset editingWallet when canceling
-                className="w-full p-2 bg-gray-300 text-gray-700 rounded-lg mt-2"
+                className="w-full p-2 bg-gray-500 text-white rounded-lg mt-2"
               >
                 Cancel
               </button>
