@@ -68,7 +68,7 @@ function App() {
 
   // WebSocket notification for new wallet creation
   useEffect(() => {
-    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app:8081/ws'); // Replace with your WebSocket server URL
+    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app/ws'); // Replace with your WebSocket server URL
 
     socket.onopen = () => {
       console.log('WebSocket connected');
