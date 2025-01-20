@@ -79,6 +79,16 @@ function App() {
     }
   };
 
+  // Fetch chat history from the backend
+  const fetchChatHistory = async () => {
+    try {
+      const response = await axios.get('https://your-backend-api-url/api/chat-history');
+      setChatMessages(response.data); // Update chatMessages state with the data received
+    } catch (error) {
+      console.error("Error fetching chat history:", error);
+    }
+  };
+  
   // WebSocket Setup
   useEffect(() => {
     if (isValidUsername) { // Check if username is valid before connecting WebSocket
@@ -243,16 +253,9 @@ function App() {
               />
               <button
                 type="submit"
-                className="w-full p-2 bg-blue-600 text-white rounded-lg mt-2"
+                className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg"
               >
                 Update Wallet
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditingWallet(null)}
-                className="w-full p-2 bg-gray-300 text-gray-700 rounded-lg mt-2"
-              >
-                Cancel
               </button>
             </form>
           </div>
@@ -261,34 +264,41 @@ function App() {
         {/* Chat Section */}
         {isValidUsername && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
-            <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
-              {chatMessages
-                .filter(msg => msg.message.trim() !== "") // Filter out empty messages
-                .map((msg, index) => (
-                  <div key={index}>
-                    <strong>{msg.username}:</strong> {msg.message}
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Chat Room</h2>
+              <div className="space-y-2">
+                {chatMessages.map((msg, index) => (
+                  <div key={index} className="p-2 bg-gray-100 rounded-md shadow-sm">
+                    <p>
+                      <strong>{msg.username}:</strong> {msg.message}
+                    </p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4">
+                <textarea
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  rows="3"
+                  placeholder="Type a message..."
+                />
+                <button
+                  onClick={sendMessage}
+                  className="mt-2 py-2 px-4 bg-blue-500 text-white rounded-lg"
+                >
+                  Send Message
+                </button>
+              </div>
             </div>
-            <div className="mt-4 flex">
-              <input
-                type="text"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                placeholder="Type a message"
-                className="w-full p-2 border border-gray-300 rounded-lg"
-              />
-              <button
-                onClick={sendMessage}
-                className="ml-2 p-2 bg-blue-600 text-white rounded-lg"
-              >
-                Send
-              </button>
-            </div>
+            <button
+              onClick={fetchChatHistory}
+              className="mt-4 py-2 px-4 bg-gray-500 text-white rounded-lg"
+            >
+              Fetch Chat History
+            </button>
           </div>
         )}
-
       </div>
     </div>
   );
