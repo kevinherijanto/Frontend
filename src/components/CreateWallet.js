@@ -23,7 +23,7 @@ function CreateWallet({ username, onWalletCreated }) {
         currency: currency,
       };
 
-      const response = await axios.post('https://backend-production-4e20.up.railway.app:8080/wallets', walletData);
+      const response = await axios.post('https://backend-production-4e20.up.railway.app/wallets', walletData);
       onWalletCreated(response.data);
       setAddress('');
       setBalance('');
