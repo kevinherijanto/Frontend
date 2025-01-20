@@ -83,28 +83,34 @@ function App() {
   useEffect(() => {
     if (isValidUsername) { // Check if username is valid before connecting WebSocket
       const ws = new WebSocket("wss://backend-production-4e20.up.railway.app/ws");
-
+  
       ws.onopen = () => {
         console.log("WebSocket connected");
         ws.send(JSON.stringify({ type: "join", username }));
       };
-
+  
       ws.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        setChatMessages((prev) => [...prev, message]);
+  
+        // If message is an array, it's chat history
+        if (Array.isArray(message)) {
+          setChatMessages(message); // Set initial chat history
+        } else {
+          setChatMessages((prev) => [...prev, message]); // Append new message
+        }
       };
-
+  
       ws.onerror = (error) => console.error("WebSocket error:", error);
       ws.onclose = () => console.log("WebSocket disconnected");
-
+  
       setSocket(ws);
-
+  
       return () => {
         ws.close();
       };
     }
   }, [username, isValidUsername]);
-
+  
   const sendMessage = () => {
     if (socket && messageInput.trim()) {
       socket.send(JSON.stringify({ username, message: messageInput }));
