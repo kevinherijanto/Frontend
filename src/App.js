@@ -253,33 +253,36 @@ function App() {
         )}
 
         {/* Chat Section */}
-        {isValidUsername && chatMessages.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
-            <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
-              {chatMessages.map((msg, index) => (
+        {isValidUsername && chatMessages.length > 0 && chatMessages.some(msg => msg.message.trim() !== "") && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
+          <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
+            {chatMessages.map((msg, index) => (
+              msg.message.trim() !== "" && (
                 <div key={index}>
                   <strong>{msg.username}:</strong> {msg.message}
                 </div>
-              ))}
-            </div>
-            <div className="mt-4 flex">
-              <input
-                type="text"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                placeholder="Type a message"
-                className="w-full p-2 border border-gray-300 rounded-lg"
-              />
-              <button
-                onClick={sendMessage}
-                className="ml-2 p-2 bg-blue-600 text-white rounded-lg"
-              >
-                Send
-              </button>
-            </div>
+              )
+            ))}
           </div>
-        )}
+          <div className="mt-4 flex">
+            <input
+              type="text"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              placeholder="Type a message"
+              className="w-full p-2 border border-gray-300 rounded-lg"
+            />
+            <button
+              onClick={sendMessage}
+              className="ml-2 p-2 bg-blue-600 text-white rounded-lg"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      )}
+
       </div>
     </div>
   );
