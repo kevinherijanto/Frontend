@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/wallets';
+const API_URL = 'http://backend-production-4e20.up.railway.app:3000/wallets';
 
 export const createWallet = async (walletData) => {
   try {

@@ -25,7 +25,7 @@ const WalletList = ({ wallets, fetchWallets }) => {
     }
 
     try {
-      await axios.put(`http://localhost:3000/wallets/${editingWallet.id}`, updatedData);
+      await axios.put(`https://backend-production-4e20.up.railway.app:3000/wallets/${editingWallet.id}`, updatedData);
       setEditingWallet(null); // Close edit form
       fetchWallets(); // Refresh wallet list
     } catch (error) {
@@ -40,7 +40,7 @@ const WalletList = ({ wallets, fetchWallets }) => {
     if (!confirmDelete) return; // Exit if user cancels
 
     try {
-      await axios.delete(`http://localhost:3000/wallets/${id}`);
+      await axios.delete(`https://backend-production-4e20.up.railway.app:3000/wallets/${id}`);
       fetchWallets(); // Refresh wallet list
     } catch (error) {
       console.error("Error deleting wallet:", error);

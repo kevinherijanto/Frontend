@@ -17,7 +17,7 @@ function App() {
     if (username.trim()) {
       try {
         const response = await axios.get(
-          `http://backend-production-4e20.up.railway.app:3000/wallets/username/${username}`
+          `https://backend-production-4e20.up.railway.app:3000/wallets/username/${username}`
         );
         setWallets(response.data);
       } catch (error) {
@@ -37,7 +37,7 @@ function App() {
   const handleUpdateWallet = async (updatedWallet) => {
     try {
       await axios.put(
-        `http://backend-production-4e20.up.railway.app:3000/wallets/${updatedWallet.ID}`,
+        `https://backend-production-4e20.up.railway.app:3000/wallets/${updatedWallet.ID}`,
         updatedWallet
       );
       setEditingWallet(null);
@@ -51,7 +51,7 @@ function App() {
     if (window.confirm('Are you sure you want to delete this wallet?')) {
       try {
         await axios.delete(
-          `http://backend-production-4e20.up.railway.app:3000/wallets/${walletId}`
+          `https://backend-production-4e20.up.railway.app:3000/wallets/${walletId}`
         );
         fetchWallets();
       } catch (error) {
