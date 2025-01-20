@@ -253,7 +253,7 @@ function App() {
         )}
 
         {/* Chat Section */}
-        {isValidUsername && (
+        {isValidUsername && chatMessages.length > 0 && (
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
             <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
