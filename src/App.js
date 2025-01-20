@@ -14,6 +14,7 @@ function App() {
   const [messageInput, setMessageInput] = useState("");
   const [socket, setSocket] = useState(null);
 
+  // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
 
   const fetchWallets = useCallback(async () => {
@@ -123,48 +124,124 @@ function App() {
           />
         </div>
 
-        {/* Wallet Section */}
+        {/* Wallet Creation Form */}
         <CreateWallet username={username} onWalletCreated={handleWalletCreated} />
 
+        {/* New Wallet Notification */}
         {showNewWallet && newWallet && (
           <div className="mt-6 p-4 bg-green-100 rounded-lg shadow-sm">
             <h3 className="text-lg font-medium text-green-800">New Wallet Created:</h3>
-            <p>
+            <p className="text-gray-700">
               <strong>Address:</strong> {newWallet.address}
             </p>
-            <p>
+            <p className="text-gray-700">
               <strong>Balance:</strong> {newWallet.balance}
             </p>
-            <p>
+            <p className="text-gray-700">
               <strong>Currency:</strong> {newWallet.currency}
             </p>
           </div>
         )}
 
+        {/* Wallet List */}
         {wallets.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Your Wallets</h2>
-            <ul>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Wallets</h2>
+            <ul className="space-y-4">
               {wallets.map((wallet) => (
-                <li key={wallet.id}>
-                  <p>
+                <li key={wallet.id} className="p-4 bg-gray-50 rounded-lg shadow-md">
+                  <p className="text-gray-700">
                     <strong>Address:</strong> {wallet.address}
                   </p>
-                  <p>
+                  <p className="text-gray-700">
                     <strong>Balance:</strong> {wallet.balance}
                   </p>
-                  <p>
+                  <p className="text-gray-700">
                     <strong>Currency:</strong> {wallet.currency}
                   </p>
+                  <div className="mt-2 flex space-x-2">
+                    <button
+                      onClick={() => setEditingWallet(wallet)}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      Edit Wallet
+                    </button>
+                    <button
+                      onClick={() => handleDeleteWallet(wallet.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Delete Wallet
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
+        {/* Edit Wallet Form */}
+        {editingWallet && (
+          <div className="mt-6 p-4 bg-yellow-100 rounded-lg shadow-sm">
+            <h3 className="text-lg font-medium text-yellow-800">Edit Wallet</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateWallet(editingWallet);
+              }}
+            >
+              <input
+                type="text"
+                value={editingWallet.address}
+                onChange={(e) =>
+                  setEditingWallet({ ...editingWallet, address: e.target.value })
+                }
+                className="w-full p-2 border border-gray-300 rounded-lg mb-2"
+                placeholder="Wallet Address"
+                required
+              />
+              <input
+                type="number"
+                value={editingWallet.balance}
+                onChange={(e) =>
+                  setEditingWallet({
+                    ...editingWallet,
+                    balance: parseFloat(e.target.value),
+                  })
+                }
+                className="w-full p-2 border border-gray-300 rounded-lg mb-2"
+                placeholder="Balance"
+                required
+              />
+              <input
+                type="text"
+                value={editingWallet.currency}
+                onChange={(e) =>
+                  setEditingWallet({ ...editingWallet, currency: e.target.value })
+                }
+                className="w-full p-2 border border-gray-300 rounded-lg mb-2"
+                placeholder="Currency"
+                required
+              />
+              <button
+                type="submit"
+                className="w-full p-2 bg-blue-600 text-white rounded-lg mt-2"
+              >
+                Update Wallet
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingWallet(null)}
+                className="w-full p-2 bg-gray-300 text-gray-700 rounded-lg mt-2"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+        )}
+
         {/* Chat Section */}
         <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Chat</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Chat</h2>
           <div className="h-64 overflow-y-scroll border p-4 bg-gray-50 rounded-lg">
             {chatMessages.map((msg, index) => (
               <div key={index}>
