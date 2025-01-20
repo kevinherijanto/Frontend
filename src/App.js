@@ -12,20 +12,26 @@ function App() {
   // Handle username change
   const handleUsernameChange = (e) => setUsername(e.target.value);
 
-  // Memoize fetchWallets to avoid unnecessary re-renders
   const fetchWallets = useCallback(async () => {
     if (username.trim()) {
       try {
         const response = await axios.get(
           `https://backend-production-4e20.up.railway.app/wallets/username/${username}`
         );
-        setWallets(response.data);
+        console.log('Response:', response);  // Log the full response for debugging
+        if (response.data.error) {
+          // If the backend returns an error message like 'No wallets found'
+          setWallets([]); // Empty wallets if no data found
+        } else {
+          setWallets(response.data);  // Otherwise, update with the wallet data
+        }
       } catch (error) {
         console.error('Error fetching wallets:', error);
-        setWallets([]);
+        setWallets([]);  // Clear wallets on error
       }
     }
-  }, [username]); // Dependency on username to re-fetch wallets when it changes
+  }, [username]);
+  
 
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
@@ -62,7 +68,7 @@ function App() {
 
   // WebSocket notification for new wallet creation
   useEffect(() => {
-    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app:8081'); // Replace with your WebSocket server URL
+    const socket = new WebSocket('wss://backend-production-4e20.up.railway.app'); // Replace with your WebSocket server URL
 
     socket.onopen = () => {
       console.log('WebSocket connected');
