@@ -28,7 +28,7 @@ function App() {
           setIsAuthenticated(true);
           setIsValidUsername(true);
           setUsername(response.data.username);  // Assuming backend sends the username
-          fetchWallets();
+      
         })
         .catch(err => {
           setIsAuthenticated(false);
@@ -38,22 +38,48 @@ function App() {
     }
   }, []);
   const fetchWallets = useCallback(async () => {
-    if (username.trim()) {
-      try {
-        const response = await axios.get(
-          `https://backend-production-4e20.up.railway.app/wallets/username/${username}`
-        );
-        if (response.data.error) {
-          setWallets([]);
-        } else {
-          setWallets(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching wallets:", error);
+    try {
+      // Get the JWT token from localStorage
+      const token = localStorage.getItem("jwt");
+      if (!token) {
+        console.error("JWT token not found. Please log in.");
         setWallets([]);
+        return;
       }
+  
+      // Fetch the username from /protected/profile
+      const profileResponse = await axios.get(
+        "https://backend-production-4e20.up.railway.app/protected/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Pass the token
+          },
+        }
+      );
+  
+      const { username } = profileResponse.data;
+      if (!username) {
+        console.error("Username not found in the profile response.");
+        setWallets([]);
+        return;
+      }
+  
+      // Fetch wallets using the extracted username
+      const walletsResponse = await axios.get(
+        `https://backend-production-4e20.up.railway.app/wallets/username/${username}`
+      );
+  
+      if (walletsResponse.data.error) {
+        setWallets([]);
+      } else {
+        setWallets(walletsResponse.data);
+      }
+    } catch (error) {
+      console.error("Error fetching wallets:", error);
+      setWallets([]);
     }
-  }, [username]);
+  }, []);
+  
 
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
