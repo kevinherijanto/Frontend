@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { BrowserRouter as Router, Route, Routes, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from "axios";
 import CreateWallet from "./components/CreateWallet";
 import Login from "./components/Login";
@@ -320,12 +320,12 @@ function App() {
               </div>
             </div>
           ) : (
-            <Redirect to="/login" />
+            <Navigate to="/login" />
           )}
         </Route>
   
         {/* Redirect if user tries to access an unknown route */}
-        <Redirect to="/login" />
+        <Navigate to="/login" />
       </Routes>
     </Router>
   );
