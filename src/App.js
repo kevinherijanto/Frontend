@@ -131,7 +131,7 @@ function App() {
   
   // WebSocket Setup
   useEffect(() => {
-    if (isValidUsername) { // Check if username is valid before connecting WebSocket
+    if (isValidUsername && isAuthenticated) { // Check if username is valid before connecting WebSocket
       const ws = new WebSocket("wss://backend-production-4e20.up.railway.app/ws");
   
       ws.onopen = () => {
@@ -159,13 +159,15 @@ function App() {
         ws.close();
       };
     }
-  }, [username, isValidUsername]);
+  }, [isAuthenticated, username, isValidUsername]);
   
   const sendMessage = () => {
-    if (socket && messageInput.trim()) {
+    if (socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify({ username, message: messageInput }));
       setMessageInput("");
-    }
+    } else {
+      console.log("WebSocket is not open.");
+  }
   };
 
   useEffect(() => {
