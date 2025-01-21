@@ -28,6 +28,7 @@ function App() {
           setIsAuthenticated(true);
           setIsValidUsername(true);
           setUsername(response.data.username);  // Assuming backend sends the username
+          fetchWallets();
         })
         .catch(err => {
           setIsAuthenticated(false);
