@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const LoginPage = ({setIsAuthenticated}) => {
-  const [username, setUsername] = useState('');
+const LoginPage = ({ setIsAuthenticated, setUsername }) => {
+  const [username, setUsernameInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const history = useNavigate();
 
@@ -46,7 +46,7 @@ const LoginPage = ({setIsAuthenticated}) => {
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUsernameInput(e.target.value)}
               placeholder="Enter Username"
               className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               required
