@@ -24,6 +24,7 @@ const LoginPage = () => {
       if (response.data.token) {
         localStorage.setItem('jwt', response.data.token);
         history('/');
+        setUsername({ username });
       }
     } catch (err) {
       setErrorMessage('Failed to login. Please try again.');
