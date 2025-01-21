@@ -27,8 +27,9 @@ function App() {
         .then(response => {
           setIsAuthenticated(true);
           setIsValidUsername(true);
+          console.log("Username from backend:", response.data.username);
           setUsername(response.data.username);  // Assuming backend sends the username
-      
+          fetchWallets();
         })
         .catch(err => {
           setIsAuthenticated(false);
@@ -37,6 +38,7 @@ function App() {
         });
     }
   }, []);
+
   const fetchWallets = useCallback(async () => {
     try {
       // Get the JWT token from localStorage
