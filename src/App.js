@@ -24,6 +24,7 @@ function App() {
     try {
       // Get the JWT token from localStorage
       const token = localStorage.getItem("jwt");
+      console.log('Token:', token);
       if (!token) {
         console.error("JWT token not found. Please log in.");
         setWallets([]);
