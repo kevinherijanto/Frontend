@@ -36,8 +36,6 @@ function App() {
         });
     }
   }, []);
-
-  const handleUsernameChange = (e) => setUsername(e.target.value);
   const fetchWallets = useCallback(async () => {
     if (username.trim()) {
       try {
