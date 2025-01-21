@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);  // Track if user is logged in
   const history = useNavigate();
 
   const handleLogin = async (e) => {
@@ -23,8 +24,8 @@ const LoginPage = () => {
 
       if (response.data.token) {
         localStorage.setItem('jwt', response.data.token);
+        setIsLoggedIn(true);  // Set login state to true
         history('/');
-        setUsername(username);
       }
     } catch (err) {
       setErrorMessage('Failed to login. Please try again.');

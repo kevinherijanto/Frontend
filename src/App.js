@@ -11,7 +11,7 @@ function App() {
   const [newWallet, setNewWallet] = useState(null);
   const [editingWallet, setEditingWallet] = useState(null);
   const [showNewWallet, setShowNewWallet] = useState(false);
-
+  const [isLoggedIn, setIsLoggedIn]  = useState(false);
   // Chat State
   const [chatMessages, setChatMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
@@ -63,25 +63,28 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    const token = localStorage.getItem('jwt');
-    if (token) {
-      axios.get('https://backend-production-4e20.up.railway.app/protected/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(response => {
-          setIsAuthenticated(true);
-          setIsValidUsername(true);
-          console.log("Username from backend:", response.data.username);
-          setUsername(response.data.username);  // Assuming backend sends the username
-          fetchWallets();
+    // This effect will run only when isLoggedIn is true
+    if (isLoggedIn) {
+      const token = localStorage.getItem('jwt');
+      if (token) {
+        axios.get('https://backend-production-4e20.up.railway.app/protected/profile', {
+          headers: { Authorization: `Bearer ${token}` }
         })
-        .catch(err => {
-          setIsAuthenticated(false);
-          setIsValidUsername(false);
-          localStorage.removeItem('jwt');
-        });
+          .then(response => {
+            console.log("Username from backend:", response.data.username);
+            setUsername(response.data.username);  // Set the username from the backend
+            setIsValidUsername(true);
+            setIsLoggedIn(true);
+            // Call any other functions like fetchWallets() here if necessary
+          })
+          .catch(err => {
+            console.error('Error fetching profile:', err);
+            setIsLoggedIn(false);
+            localStorage.removeItem('jwt');
+          });
+      }
     }
-  }, [fetchWallets]);
+  }, [isLoggedIn]); 
   
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
