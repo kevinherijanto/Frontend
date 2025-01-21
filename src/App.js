@@ -26,10 +26,12 @@ function App() {
       })
         .then(response => {
           setIsAuthenticated(true);
+          setIsValidUsername(true);
           setUsername(response.data.username);  // Assuming backend sends the username
         })
         .catch(err => {
           setIsAuthenticated(false);
+          setIsValidUsername(false);
           localStorage.removeItem('jwt');
         });
     }
