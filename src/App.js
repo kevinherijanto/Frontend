@@ -72,6 +72,7 @@ function App() {
         .then((response) => {
           setIsAuthenticated(true);
           setIsValidUsername(true);
+          console.log('Response from backend:', response); // Log the entire response
           console.log('Username from backend:', response.data.username);
           setUsername(response.data.username); // Assuming backend sends the username
           fetchWallets(); // Fetch the wallets after getting the username
