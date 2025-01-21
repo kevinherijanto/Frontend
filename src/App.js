@@ -159,20 +159,6 @@ function App() {
                     My Private Crypto Wallet Tracker
                   </h1>
   
-                  {/* Username input */}
-                  <div className="mb-4">
-                    <label className="text-lg font-medium text-gray-700">
-                      Enter Username:
-                    </label>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={handleUsernameChange}
-                      placeholder="Enter your username"
-                      className="w-full mt-2 p-2 border border-gray-300 rounded-lg"
-                    />
-                  </div>
-  
                   {/* Wallet Creation Form */}
                   <CreateWallet username={username} onWalletCreated={handleWalletCreated} />
   
