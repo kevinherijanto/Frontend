@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Redirect } from 'react-router-dom';
 import axios from "axios";
 import CreateWallet from "./components/CreateWallet";
 import Login from "./components/Login";
@@ -142,7 +142,7 @@ function App() {
 
   return (
     <Router>
-      <Switch>
+      <Routes>
         {/* Route for the Login page */}
         <Route exact path="/login" component={Login} />
   
@@ -326,7 +326,7 @@ function App() {
   
         {/* Redirect if user tries to access an unknown route */}
         <Redirect to="/login" />
-      </Switch>
+      </Routes>
     </Router>
   );
   
