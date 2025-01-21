@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import axios from "axios";
 import CreateWallet from "./components/CreateWallet";
 import Login from "./components/Login";
-import LoginPage from "./components/Login";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -175,7 +174,7 @@ function App() {
     <Router>
       <Routes>
         {/* Route for the Login page */}
-        <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} />} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} />} />
   
         {/* Protected Route for the Main App */}
         <Route
