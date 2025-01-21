@@ -9,22 +9,28 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const response = await axios.post('https://backend-production-4e20.up.railway.app/login', { username });
-
+      const response = await axios.post(
+        'https://backend-production-4e20.up.railway.app/login',
+        { username },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
       if (response.data.token) {
-        // Save the token to localStorage
         localStorage.setItem('jwt', response.data.token);
-        
-        // Redirect to the main app
-        history.push('/');  // Assuming '/home' is the main app route
+        history('/');
       }
     } catch (err) {
       setErrorMessage('Failed to login. Please try again.');
+      console.error('Error:', err.response ? err.response.data : err.message);
     }
   };
-
+  
   return (
     <div>
       <h2>Login</h2>
