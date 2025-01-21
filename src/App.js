@@ -296,6 +296,12 @@ function App() {
                     >
                       Send Message
                     </button>
+                    <button
+                      onClick={fetchChatHistory}
+                      className="mt-4 py-2 px-4 bg-gray-500 text-white rounded-lg"
+                    >
+                      Fetch Chat History
+                    </button>
                   </div>
                 </>
               }
