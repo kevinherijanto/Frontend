@@ -18,27 +18,8 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [isValidUsername, setIsValidUsername] = useState(false); // Add state for username validation
 
-  useEffect(() => {
-    const token = localStorage.getItem('jwt');
-    if (token) {
-      axios.get('https://backend-production-4e20.up.railway.app/protected/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(response => {
-          setIsAuthenticated(true);
-          setIsValidUsername(true);
-          console.log("Username from backend:", response.data.username);
-          setUsername(response.data.username);  // Assuming backend sends the username
-          fetchWallets();
-        })
-        .catch(err => {
-          setIsAuthenticated(false);
-          setIsValidUsername(false);
-          localStorage.removeItem('jwt');
-        });
-    }
-  }, []);
 
+  
   const fetchWallets = useCallback(async () => {
     try {
       // Get the JWT token from localStorage
@@ -81,8 +62,27 @@ function App() {
       setWallets([]);
     }
   }, []);
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      axios.get('https://backend-production-4e20.up.railway.app/protected/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(response => {
+          setIsAuthenticated(true);
+          setIsValidUsername(true);
+          console.log("Username from backend:", response.data.username);
+          setUsername(response.data.username);  // Assuming backend sends the username
+          fetchWallets();
+        })
+        .catch(err => {
+          setIsAuthenticated(false);
+          setIsValidUsername(false);
+          localStorage.removeItem('jwt');
+        });
+    }
+  }, [fetchWallets]);
   
-
   const handleWalletCreated = (wallet) => {
     setNewWallet(wallet);
     setShowNewWallet(true);
