@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import axios from "axios";
 import CreateWallet from "./components/CreateWallet";
 import Login from "./components/Login";
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -173,7 +174,14 @@ function App() {
   useEffect(() => {
     if (username.trim()) fetchWallets();
   }, [username, fetchWallets]);
-
+  
+  const chatContainerRef = useRef(null);
+  useEffect(() => {
+    // Scroll ke bagian paling bawah saat ada pesan baru
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
   return (
     <Router>
       <Routes>
@@ -304,7 +312,7 @@ function App() {
                     <div className="mt-8">
                       <div className="mb-4">
                         <h2 className="text-lg font-semibold text-gray-800">Chat Room</h2>
-                        <div className="space-y-2 max-h-80 overflow-y-auto">
+                        <div ref={chatContainerRef} className="space-y-2 max-h-80 overflow-y-auto">
                           {chatMessages
                             .filter((msg) => msg.message.trim() !== "")
                             .map((msg, index) => (
