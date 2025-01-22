@@ -304,7 +304,7 @@ function App() {
                     <div className="mt-8">
                       <div className="mb-4">
                         <h2 className="text-lg font-semibold text-gray-800">Chat Room</h2>
-                        <div className="space-y-2">
+                        <div className="space-y-2 max-h-80 overflow-y-auto">
                           {chatMessages
                             .filter((msg) => msg.message.trim() !== "")
                             .map((msg, index) => (
