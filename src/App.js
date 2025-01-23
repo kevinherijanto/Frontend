@@ -238,7 +238,7 @@ function App() {
               <div className="min-h-screen bg-gray-100 py-8 px-4">
                 <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
                   <h1 className="text-3xl font-semibold text-center text-blue-600 mb-6">
-                    My Private Crypto Wallet Tracker
+                    Private Crypto Wallet Tracker & Crypto Community
                   </h1>
                   <div className="mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Announcements</h2>
