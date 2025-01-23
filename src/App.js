@@ -19,7 +19,41 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [isValidUsername, setIsValidUsername] = useState(false); // Add state for username validation
 
+  const [announcements, setAnnouncements] = useState([]); // State untuk menyimpan pengumuman
+  const [newAnnouncement, setNewAnnouncement] = useState(""); // Input untuk pengumuman baru
 
+  // Fetch announcements dari backend
+  const fetchAnnouncements = useCallback(async () => {
+    try {
+      const response = await axios.get('https://backend-production-4e20.up.railway.app/announcements');
+      setAnnouncements(response.data); // Update state dengan data pengumuman
+    } catch (error) {
+      console.error("Error fetching announcements:", error);
+    }
+  }, []);
+
+  // Create new announcement
+  const createAnnouncement = async () => {
+    if (!newAnnouncement.trim()) {
+      alert("Announcement cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await axios.post('https://backend-production-4e20.up.railway.app/announcements', {
+        content: newAnnouncement,
+      });
+      setAnnouncements((prev) => [...prev, response.data]); // Tambahkan pengumuman baru ke daftar
+      setNewAnnouncement(""); // Reset input pengumuman
+    } catch (error) {
+      console.error("Error creating announcement:", error);
+    }
+  };
+
+    // Panggil fetchAnnouncements saat komponen dimount
+    useEffect(() => {
+      fetchAnnouncements();
+    }, [fetchAnnouncements]);
   
   const fetchWallets = useCallback(async () => {
     try {
@@ -174,7 +208,7 @@ function App() {
   useEffect(() => {
     if (username.trim()) fetchWallets();
   }, [username, fetchWallets]);
-  
+
   const chatContainerRef = useRef(null);
   useEffect(() => {
     // Scroll ke bagian paling bawah saat ada pesan baru
@@ -198,7 +232,34 @@ function App() {
                   <h1 className="text-3xl font-semibold text-center text-blue-600 mb-6">
                     My Private Crypto Wallet Tracker
                   </h1>
-  
+                  <div className="mb-8">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Announcements</h2>
+                    <div className="space-y-4">
+                      {announcements.map((announcement, index) => (
+                        <div
+                          key={index}
+                          className="p-4 bg-gray-50 rounded-lg shadow-md"
+                        >
+                          <p className="text-gray-700">{announcement.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4">
+                      <textarea
+                        className="w-full p-2 border border-gray-300 rounded-lg"
+                        value={newAnnouncement}
+                        onChange={(e) => setNewAnnouncement(e.target.value)}
+                        rows="3"
+                        placeholder="Write a new announcement..."
+                      />
+                      <button
+                        onClick={createAnnouncement}
+                        className="mt-2 py-2 px-4 bg-blue-500 text-white rounded-lg"
+                      >
+                        Add Announcement
+                      </button>
+                    </div>
+                  </div>
                   {/* Wallet Creation Form */}
                   <CreateWallet username={username} onWalletCreated={handleWalletCreated} />
   
