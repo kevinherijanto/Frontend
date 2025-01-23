@@ -242,7 +242,7 @@ function App() {
                   </h1>
                   <div className="mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Announcements</h2>
-                    <div ref={announcementContainerRef} className="space-y-4 max-h-20 overflow-y-auto">
+                    <div ref={announcementContainerRef} className="space-y-4 max-h-17 overflow-y-auto">
                       {announcements.map((announcement, index) => (
                         <div
                           key={index}
