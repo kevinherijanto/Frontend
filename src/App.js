@@ -26,7 +26,8 @@ function App() {
   const fetchAnnouncements = useCallback(async () => {
     try {
       const response = await axios.get('https://backend-production-4e20.up.railway.app/announcements');
-      setAnnouncements(response.data); // Update state dengan data pengumuman
+      const latestAnnouncement = response.data[0];
+      setAnnouncements(latestAnnouncement); // Update state dengan data pengumuman
     } catch (error) {
       console.error("Error fetching announcements:", error);
     }
