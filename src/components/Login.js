@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const LoginPage = ({ setIsAuthenticated, setUsername }) => {
+const LoginPage = ({ setIsAuthenticated, setUsername, fetchAnnouncements }) => {
   const [username, setUsernameInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const history = useNavigate();
@@ -25,6 +25,7 @@ const LoginPage = ({ setIsAuthenticated, setUsername }) => {
         localStorage.setItem('jwt', response.data.token);
         setIsAuthenticated(true);
         setUsername(username);
+        fetchAnnouncements()
         history('/');
       }
     } catch (err) {

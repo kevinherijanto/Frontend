@@ -220,7 +220,7 @@ function App() {
     <Router>
       <Routes>
         {/* Route for the Login page */}
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} />} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} fetchAnnouncements={fetchAnnouncements}/>} />
   
         {/* Protected Route for the Main App */}
         <Route
