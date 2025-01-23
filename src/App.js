@@ -49,12 +49,18 @@ function App() {
       console.error("Error creating announcement:", error);
     }
   };
-
-    // Panggil fetchAnnouncements saat komponen dimount
+  
     useEffect(() => {
       fetchAnnouncements();
     }, [fetchAnnouncements]);
-  
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        fetchAnnouncements();
+      }, 1000); // Panggil setiap 1000ms (1 detik)
+    
+      return () => clearInterval(interval); // Bersihkan interval saat komponen di-unmount
+    }, [fetchAnnouncements]);
   const fetchWallets = useCallback(async () => {
     try {
       // Get the JWT token from localStorage
