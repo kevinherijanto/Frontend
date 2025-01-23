@@ -26,8 +26,7 @@ function App() {
   const fetchAnnouncements = useCallback(async () => {
     try {
       const response = await axios.get('https://backend-production-4e20.up.railway.app/announcements');
-      const latestAnnouncement = Array.isArray(response.data) ? [response.data[0]] : [];
-      setAnnouncements(latestAnnouncement); // Update state dengan data pengumuman
+      setAnnouncements(response.data); // Update state dengan data pengumuman
     } catch (error) {
       console.error("Error fetching announcements:", error);
     }
@@ -235,7 +234,7 @@ function App() {
                   </h1>
                   <div className="mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Announcements</h2>
-                    <div className="space-y-4">
+                    <div className="space-y-4 max-h-20 overflow-y-auto">
                       {announcements.map((announcement, index) => (
                         <div
                           key={index}
