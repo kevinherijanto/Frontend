@@ -373,7 +373,7 @@ function App() {
                   {isValidUsername && (
                     <div className="mt-8">
                       <div className="mb-4">
-                        <h2 className="text-lg font-semibold text-gray-800">Chat Room</h2>
+                        <h2 className="text-lg font-semibold text-gray-800">Chat Room Para Pemilik Wallet</h2>
                         <div ref={chatContainerRef} className="space-y-2 max-h-80 overflow-y-auto">
                           {chatMessages
                             .filter((msg) => msg.message.trim() !== "")
