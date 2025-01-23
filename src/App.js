@@ -216,6 +216,14 @@ function App() {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
+  const announcementContainerRef = useRef(null);
+  useEffect(() => {
+    // Scroll ke bagian paling bawah saat ada pengumuman baru
+    if (announcementContainerRef.current) {
+      announcementContainerRef.current.scrollTop = announcementContainerRef.current.scrollHeight;
+    }
+  }, [announcements]); // Trigger efek saat announcements berubah
+  
   return (
     <Router>
       <Routes>
@@ -234,7 +242,7 @@ function App() {
                   </h1>
                   <div className="mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Announcements</h2>
-                    <div className="space-y-4 max-h-20 overflow-y-auto">
+                    <div ref={announcementContainerRef} className="space-y-4 max-h-20 overflow-y-auto">
                       {announcements.map((announcement, index) => (
                         <div
                           key={index}
