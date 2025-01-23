@@ -49,7 +49,7 @@ function App() {
       console.error("Error creating announcement:", error);
     }
   };
-  
+
     useEffect(() => {
       fetchAnnouncements();
     }, [fetchAnnouncements]);
@@ -420,6 +420,7 @@ function App() {
                       >
                         Fetch Chat History
                       </button>
+                      <button>Test</button>
                     </div>
                   )}
                 </div>
